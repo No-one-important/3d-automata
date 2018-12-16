@@ -11,14 +11,10 @@ type VAO struct {
 	VertexBuffer  uint32
 	NormalsBuffer uint32
 	ColorsBuffer  uint32
-	IndexBuffer   uint32
-
-	hasElements bool
-	count       int32
 }
 
-// returns a vertex array from the vertices provided
-func makeVAO(vertices, normals, colors []float32, indices []uint32) VAO {
+// Returns a vertex array from the vertices provided
+func makeVAO(vertices, normals []float32) VAO {
 	var vao VAO
 
 	// Create VAO buffer
@@ -47,26 +43,6 @@ func makeVAO(vertices, normals, colors []float32, indices []uint32) VAO {
 		gl.VertexAttribPointer(1, 3, gl.FLOAT, false, 0, nil)
 	} else {
 		gl.DisableVertexAttribArray(1)
-	}
-
-	// Create Color buffer
-	if colors != nil {
-		gl.GenBuffers(1, &vao.ColorsBuffer)
-		gl.BindBuffer(gl.ARRAY_BUFFER, vao.ColorsBuffer)
-		gl.BufferData(gl.ARRAY_BUFFER, len(colors)*4, gl.Ptr(colors), gl.STATIC_DRAW)
-
-		gl.EnableVertexAttribArray(2)
-		gl.VertexAttribPointer(2, 4, gl.FLOAT, false, 0, nil)
-	} else {
-		gl.DisableVertexAttribArray(2)
-	}
-
-	if indices != nil {
-		gl.GenBuffers(1, &vao.IndexBuffer)
-		gl.BindBuffer(gl.ELEMENT_ARRAY_BUFFER, vao.IndexBuffer)
-		gl.BufferData(gl.ELEMENT_ARRAY_BUFFER, len(indices)*4, gl.Ptr(indices), gl.STATIC_DRAW)
-
-		vao.hasElements = true
 	}
 
 	// Disable VAO

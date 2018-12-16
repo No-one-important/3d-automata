@@ -45,7 +45,7 @@ func (a *Automata) Init() {
 		}
 	}
 
-	a.cube.Create(cubeVertices, cubeNormals, nil, nil, gl.TRIANGLES)
+	a.cube.Create(cubeVertices, cubeNormals)
 }
 
 func (a *Automata) countNeighbors(i, j, k int32) uint8 {
