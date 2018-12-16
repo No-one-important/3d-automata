@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"runtime"
 	"time"
 
@@ -10,19 +9,19 @@ import (
 	"github.com/go-gl/mathgl/mgl32"
 )
 
-const fps = 60
-
-var window *glfw.Window
+// Engine ...
+type Engine struct {
+	window   *glfw.Window
+	prog     shaderProgram
+	automata Automata
+}
 
 func init() {
 	runtime.LockOSThread()
 }
 
-var cube Object
-var prog flatShaderProgram
-
-// Create the engine
-func create() {
+// Init the engine
+func (e *Engine) Init() {
 	var err error
 
 	// Init window
@@ -36,31 +35,25 @@ func create() {
 	glfw.WindowHint(glfw.OpenGLForwardCompatible, glfw.True)
 
 	// Create a Window
-	window, err = glfw.CreateWindow(1000, 1000, "3D Automata", nil, nil)
+	e.window, err = glfw.CreateWindow(1000, 1000, "3D Automata", nil, nil)
 	checkPanic(err)
 
-	window.MakeContextCurrent()
-
 	// Init GL context
+	e.window.MakeContextCurrent()
 	checkPanic(gl.Init())
 
 	// Display version
-	log.Println("OpenGL version", gl.GoStr(gl.GetString(gl.VERSION)))
+	// log.Println("OpenGL version", gl.GoStr(gl.GetString(gl.VERSION)))
 
-	// Shader
-	prog.id = createShaderProgram(flatVertexShader, flatFragmentShader)
+	e.automata.Init()
 
-	gl.UseProgram(prog.id)
-	prog.projUniform = gl.GetUniformLocation(prog.id, gl.Str("proj\x00"))
-	prog.viewUniform = gl.GetUniformLocation(prog.id, gl.Str("view\x00"))
-	prog.modelUniform = gl.GetUniformLocation(prog.id, gl.Str("model\x00"))
-	prog.colorUniform = gl.GetUniformLocation(prog.id, gl.Str("color\x00"))
-
-	cube.Create3D(cubeVertices, cubeNormals, nil, nil, gl.TRIANGLES)
+	e.prog.Create()
 }
 
-// Loop through the game logic
-func loop() {
+// Run through the game logic
+func (e *Engine) Run() {
+	const fps = 120
+
 	var cl Clock
 	cl.Init()
 
@@ -70,46 +63,51 @@ func loop() {
 	gl.ClearColor(0, 0, 0, 1)
 
 	// Matrices
-	projection := mgl32.Perspective(mgl32.DegToRad(45.0), 1.0, 0.1, 100.0)
-	model := mgl32.Ident4()
+	projection := mgl32.Perspective(mgl32.DegToRad(45.0), 1.0, 0.1, 1000.0)
 
-	gl.UseProgram(prog.id)
-	gl.UniformMatrix4fv(prog.projUniform, 1, false, &projection[0])
-	gl.UniformMatrix4fv(prog.modelUniform, 1, false, &model[0])
-	gl.Uniform4f(prog.colorUniform, 0.6, 0.6, 0.6, 1)
+	gl.UseProgram(e.prog.id)
+	gl.UniformMatrix4fv(e.prog.projUniform, 1, false, &projection[0])
+	gl.Uniform4f(e.prog.colorUniform, 0.6, 0.6, 0.6, 1)
 
-	eye := mgl32.Vec3{5, 5, 5}
+	eye := mgl32.Vec3{80, 80, 80}
 	center := mgl32.Vec3{0, 0, 0}
 	up := mgl32.Vec3{0, 1, 0}
 
-	for !window.ShouldClose() {
-		// Get start of frame time
+	t := 0.0
+	for !e.window.ShouldClose() {
 		cl.Tic()
-		// print("\rFPS:", int(1.0/cl.GetElapsed()), "         ")
+		print("\rFPS:", int(1.0/cl.GetElapsed()), "         ")
+
+		// Simulate automata
+		if t > 0.1 {
+			e.automata.Simulate()
+			t = 0.0
+		}
 
 		// Scene rendering
 		gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
 		// Rotate scene
-		rotate := mgl32.Rotate3DY(0.01)
+		rotate := mgl32.Rotate3DY(0.005)
 		eye = rotate.Mul3x1(eye)
 		view := mgl32.LookAtV(eye, center, up)
-		gl.UniformMatrix4fv(prog.viewUniform, 1, false, &view[0])
+		gl.UniformMatrix4fv(e.prog.viewUniform, 1, false, &view[0])
 
-		// Draw scene
-		cube.Draw()
+		e.automata.Draw(&e.prog)
 
-		window.SwapBuffers()
+		e.window.SwapBuffers()
 
 		// Detect inputs
 		glfw.PollEvents()
 
 		// Get end of frame time & wait for PFS cap
-		time.Sleep(time.Microsecond * time.Duration((1.0/fps-cl.Toc())*1e6))
+		toc := cl.Toc()
+		t += toc
+		time.Sleep(time.Microsecond * time.Duration((1.0/fps-toc)*1e6))
 	}
 }
 
 // Stop the engine's execution
-func stop() {
+func (e *Engine) Stop() {
 	glfw.Terminate()
 }

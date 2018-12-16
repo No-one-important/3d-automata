@@ -9,7 +9,8 @@ func checkPanic(err error) {
 }
 
 func main() {
-	create()
-	loop()
-	stop()
+	var engine Engine
+	engine.Init()
+	engine.Run()
+	engine.Stop()
 }

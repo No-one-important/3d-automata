@@ -12,8 +12,8 @@ type Object struct {
 	dim       int
 }
 
-// Create3D builds a VAO storing 3D geometry
-func (o *Object) Create3D(vertices, normals, colors []float32, indices []uint32, primitive uint32) {
+// Create builds a VAO storing 3D geometry
+func (o *Object) Create(vertices, normals, colors []float32, indices []uint32, primitive uint32) {
 	// Create the Array Object based on the mesh
 	o.vao = makeVAO(vertices, normals, colors, indices)
 	if indices != nil {
