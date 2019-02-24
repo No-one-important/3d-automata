@@ -2,8 +2,6 @@ package main
 
 import (
 	"math/rand"
-
-	"github.com/go-gl/gl/v4.1-core/gl"
 )
 
 // Automata ...
@@ -16,8 +14,8 @@ type Automata struct {
 }
 
 // Init the automata
-func (a *Automata) Init() {
-	a.N = 1 << 6
+func (a *Automata) Init(N int) {
+	a.N = int32(N)
 
 	// Create grid
 	a.grid = make([][][][]uint8, 2)
@@ -63,16 +61,14 @@ func (a *Automata) countNeighbors(i, j, k int32) uint8 {
 	return n
 }
 
-// Simulate the automata's next state
-func (a *Automata) Simulate() {
+func (a *Automata) fracSimulate(i0, i1 int32, ch chan int) {
 	var i, j, k int32
 
-	for i = 1; i <= a.N; i++ {
+	for i = i0; i < i1; i++ {
 		for j = 1; j <= a.N; j++ {
 			for k = 1; k <= a.N; k++ {
 				n := a.countNeighbors(i, j, k)
 
-				// Survive: 13,14,16 to 26  |  Birth: 17,18,19
 				a.grid[1-a.ptr][i][j][k] = 0
 				if a.grid[a.ptr][i][j][k] == 0 {
 					if n >= 6 && n <= 8 {
@@ -89,11 +85,35 @@ func (a *Automata) Simulate() {
 		}
 	}
 
+	ch <- 0
+}
+
+// Simulate the automata's next state
+func (a *Automata) Simulate() {
+	var i int32
+	var step int32 = 20
+
+	ch := make(chan int)
+
+	for i = 1; i <= a.N; i += step {
+		j := i + step
+		if j > a.N {
+			j = a.N
+		}
+		go a.fracSimulate(i, j, ch)
+	}
+
+	for i = 1; i <= a.N; i += step {
+		<-ch
+	}
+
 	a.ptr = 1 - a.ptr
 }
 
 // Draw the current automata's state
 func (a *Automata) Draw(prog *shaderProgram) {
+	instances := []int32{}
+
 	for i := int32(1); i <= a.N; i++ {
 		for j := int32(1); j <= a.N; j++ {
 			for k := int32(1); k <= a.N; k++ {
@@ -108,11 +128,13 @@ func (a *Automata) Draw(prog *shaderProgram) {
 					d = d || (a.grid[a.ptr][i][j][k+1] == 0)
 
 					if d {
-						gl.Uniform3i(prog.transUniform, i-a.N/2+1, j-a.N/2+1, k-a.N/2+1)
-						a.cube.Draw()
+						instances = append(instances, []int32{i - a.N/2 + 1, j - a.N/2 + 1, k - a.N/2 + 1}...)
 					}
 				}
 			}
 		}
 	}
+
+	a.cube.UpdateInstances(instances)
+	a.cube.Draw()
 }

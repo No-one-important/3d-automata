@@ -45,7 +45,7 @@ func (e *Engine) Init() {
 	// Display version
 	// log.Println("OpenGL version", gl.GoStr(gl.GetString(gl.VERSION)))
 
-	e.automata.Init()
+	e.automata.Init(256)
 
 	e.prog.Create()
 }
@@ -69,7 +69,7 @@ func (e *Engine) Run() {
 	gl.UniformMatrix4fv(e.prog.projUniform, 1, false, &projection[0])
 	gl.Uniform4f(e.prog.colorUniform, 0.6, 0.6, 0.6, 1)
 
-	eye := mgl32.Vec3{80, 80, 80}
+	eye := mgl32.Vec3{270, 270, 270}
 	center := mgl32.Vec3{0, 0, 0}
 	up := mgl32.Vec3{0, 1, 0}
 
@@ -79,7 +79,7 @@ func (e *Engine) Run() {
 		print("\rFPS:", int(1.0/cl.GetElapsed()), "         ")
 
 		// Simulate automata
-		if t > 0.1 {
+		if t > 0.2 {
 			e.automata.Simulate()
 			t = 0.0
 		}
@@ -103,7 +103,7 @@ func (e *Engine) Run() {
 		// Get end of frame time & wait for PFS cap
 		toc := cl.Toc()
 		t += toc
-		time.Sleep(time.Microsecond * time.Duration((1.0/fps-toc)*1e6))
+		time.Sleep(time.Duration(1.0/fps - toc))
 	}
 }
 

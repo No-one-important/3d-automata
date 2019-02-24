@@ -12,13 +12,13 @@ const vertexShader = `
 
 uniform mat4 proj;
 uniform mat4 view;
-uniform ivec3 trans;
 uniform vec4 color;
 
 vec3 light_dir = vec3(0.6, 0.2, -0.5);
 
 layout(location = 0) in vec3 vert;
 layout(location = 1) in vec3 normal;
+layout(location = 2) in ivec3 trans;
 
 flat out vec4 fcolor;
 
