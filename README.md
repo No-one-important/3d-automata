@@ -1,4 +1,5 @@
 # 3D Cellular Automata
+
 Written in Go + OpenGL
 
 ### Requirements
@@ -16,5 +17,5 @@ The following libraries are required to create a window to support the OpenGL re
 
 Simply compile and run the program
 
-    make
+    go build
     ./automata
