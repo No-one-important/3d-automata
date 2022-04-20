@@ -43,9 +43,9 @@ func (e *Engine) Init() {
 	checkPanic(gl.Init())
 
 	// Display version
-	// log.Println("OpenGL version", gl.GoStr(gl.GetString(gl.VERSION)))
+	log.Println("OpenGL version", gl.GoStr(gl.GetString(gl.VERSION)))
 
-	e.automata.Init(256)
+	e.automata.Init(70)
 
 	e.prog.Create()
 }

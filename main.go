@@ -9,6 +9,7 @@ func checkPanic(err error) {
 }
 
 func main() {
+	log.SetFlags(2 | 3)
 	var engine Engine
 	engine.Init()
 	engine.Run()
