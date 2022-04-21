@@ -3,6 +3,7 @@ package main
 import (
 	"runtime"
 	"time"
+	"log"
 
 	"github.com/go-gl/gl/v4.1-core/gl"
 	"github.com/go-gl/glfw/v3.2/glfw"
@@ -52,7 +53,7 @@ func (e *Engine) Init() {
 
 // Run through the game logic
 func (e *Engine) Run() {
-	const fps = 120
+	const fps = 60
 
 	var cl Clock
 	cl.Init()

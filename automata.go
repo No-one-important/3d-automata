@@ -71,15 +71,13 @@ func (a *Automata) fracSimulate(i0, i1 int32, ch chan int) {
 
 				a.grid[1-a.ptr][i][j][k] = 0
 				if a.grid[a.ptr][i][j][k] == 0 {
-					if n >= 6 && n <= 8 {
+					if n >= 6 && n <= 7 {
 						// Birth
 						a.grid[1-a.ptr][i][j][k] = 1
 					}
-				} else {
-					if n >= 4 && n <= 7 {
-						// Survival
-						a.grid[1-a.ptr][i][j][k] = 1
-					}
+				} else if n >= 5 && n <= 7 {
+					// Survival
+					a.grid[1-a.ptr][i][j][k] = 1
 				}
 			}
 		}
