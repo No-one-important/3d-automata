@@ -24,7 +24,7 @@ flat out vec4 fcolor;
 
 void main() {
 	// Set vertex position
-	gl_Position = proj * view * vec4(vert + trans, 0.15);
+	gl_Position = proj * view * vec4(vert + trans, 0.3);
 	float intensity = 0.45 * max(-0.5, dot(normal, normalize(light_dir)));
 	fcolor = clamp(color + vec4(intensity, intensity, intensity, 1.0), 0.0, 1.0);
 	fcolor.w = color.w;
