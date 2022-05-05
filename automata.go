@@ -14,8 +14,8 @@ type Automata struct {
 }
 
 // Init the automata
-func (a *Automata) Init(N int) {
-	a.N = int32(N)
+func (a *Automata) Init(N int32) {
+	a.N = N
 
 	// Create grid
 	a.grid = make([][][][]uint8, 2)
