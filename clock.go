@@ -28,8 +28,3 @@ func (c *Clock) Toc() float64 {
 	time := float64(time.Now().UnixNano()) / 1e9
 	return time - c.previousTime
 }
-
-// GetElapsed return the time between two tics
-func (c Clock) GetElapsed() float64 {
-	return c.elapsed
-}

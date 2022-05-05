@@ -1,9 +1,9 @@
 package main
 
 import (
+	"log"
 	"runtime"
 	"time"
-	"log"
 
 	"github.com/go-gl/gl/v4.1-core/gl"
 	"github.com/go-gl/glfw/v3.2/glfw"
@@ -77,7 +77,7 @@ func (e *Engine) Run() {
 	t := 0.0
 	for !e.window.ShouldClose() {
 		cl.Tic()
-		print("\rFPS:", int(1.0/cl.GetElapsed()), "         ")
+		print("\rFPS:", int(1.0/cl.elapsed), "         ")
 
 		// Simulate automata
 		if t > 0.2 {
